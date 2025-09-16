@@ -1,4 +1,3 @@
-// Your code here.
 const container = document.querySelector('.items');
 const cubes = document.querySelectorAll('.item');
 
@@ -6,39 +5,34 @@ let activeCube = null;
 let offsetX = 0;
 let offsetY = 0;
 
-// Get the bounding rect of the container
 const containerRect = container.getBoundingClientRect();
 
-// Set position absolute for all cubes and arrange them initially in a horizontal grid
+// Initialize each cube's CSS position & set them in a horizontal grid
 cubes.forEach(cube => {
   cube.style.position = 'absolute';
 });
 
 cubes.forEach((cube, index) => {
-  const rowCount = 5; // 5 cubes per row implicitly for layout
+  const rowCount = 5;  // 5 cubes per row
   const col = index % rowCount;
-  const row = Math.floor(index / rowCount);
   const cubeWidth = 200; // width from CSS
-  const cubeHeight = containerRect.height - 40; // height from CSS container
   cube.style.left = (col * cubeWidth) + 'px';
-  cube.style.top = '0px'; // top fixed since scrolling is horizontal
+  cube.style.top = '0px';
 });
 
-// On mouse down, activate dragging for the clicked cube
+// Mouse down to start drag
 container.addEventListener('mousedown', (e) => {
   if (e.target.classList.contains('item')) {
     activeCube = e.target;
     const rect = activeCube.getBoundingClientRect();
-    // Calculate offset between mouse and cube top-left corner
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
     container.classList.add('active');
-    // Bring the active cube to the front
-    activeCube.style.zIndex = 1000;
+    activeCube.style.zIndex = 1000; // bring to front
   }
 });
 
-// On mouse move, if dragging, update cube position constrained inside container
+// Mouse move to drag cube
 window.addEventListener('mousemove', (e) => {
   if (!activeCube) return;
 
@@ -48,19 +42,16 @@ window.addEventListener('mousemove', (e) => {
   const maxLeft = container.clientWidth - activeCube.offsetWidth;
   const maxTop = container.clientHeight - activeCube.offsetHeight;
 
-  // Boundary constraints
-  if (newLeft < 0) newLeft = 0;
-  else if (newLeft > maxLeft) newLeft = maxLeft;
-
-  if (newTop < 0) newTop = 0;
-  else if (newTop > maxTop) newTop = maxTop;
+  // Constrain inside container
+  newLeft = Math.min(Math.max(newLeft, 0), maxLeft);
+  newTop = Math.min(Math.max(newTop, 0), maxTop);
 
   activeCube.style.left = newLeft + 'px';
   activeCube.style.top = newTop + 'px';
 });
 
-// On mouse up, drop the cube and reset dragging state
-window.addEventListener('mouseup', (e) => {
+// Mouse up to drop cube
+window.addEventListener('mouseup', () => {
   if (!activeCube) return;
   activeCube.style.zIndex = '';
   activeCube = null;
